@@ -4,6 +4,28 @@ Created on Feb 11, 2015
 @author: ronaldjosephdesmarais
 '''
 
+from websockets.api.ws_api import PubSub_WS_API
+#Subscriber queue for polling
+from threading import Thread
+
+class ThreadWSCall(Thread):
+    
+    def __init(self):
+        super("ThreadWSCall")
+
+class WSSubscriberMessageQueue(object):
+    
+    def __init__(self,sub_ws_id):
+        self.sub_ws_id=sub_ws_id
+        #self.queue = []
+    
+    def send(self,msg):
+        print "Try to send WS message %s to %s "%(msg,self.sub_ws_id)
+        ws_api = PubSub_WS_API(None)
+        ws_api.pushSubscriberMessage(msg,self.sub_ws_id)
+        ws_api.closeConnection()
+
+#Subscriber queue for polling
 class SubscriberMessageQueue(object):
     
     def __init__(self,maxsize):
@@ -11,20 +33,23 @@ class SubscriberMessageQueue(object):
         self.queue = []
     
     def retrieve(self):
-        print "Try to Reteive Message"
         try:
+            #print "Retrieving Message"
             return self.queue.pop()
-        except:
+        except Exception as e:
+            #print "Subscriber Exception error %s"%e
             return None
     
     def send(self,msg):
         if len(self.queue) < self.maxsize:
+            #print "appending message %s"%msg
             self.queue.append(msg)
             return True
         else:
             return False
-        
-class MessageQueue(object):
+
+#publisher creates this message queue for polling
+class PublisherMessageQueue(object):
     
     def __init__(self,maxsize):
         self.maxsize=maxsize
@@ -42,5 +67,5 @@ class MessageQueue(object):
         
     def send(self,msg):
         for sub in self.queue:
-            print "Sending Message %s to %s"%(msg,sub)
+            #print "Sending Message %s to %s"%(msg,sub)
             sub.send(msg)

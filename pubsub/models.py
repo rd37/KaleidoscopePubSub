@@ -41,8 +41,8 @@ class publishers(models.Model):
     method_key = models.CharField(max_length=200)
     
     def send(self,j_obj,msg_queues):
-        #print "Try to send Message using Msg Queue %s using %s"%(msg_queues,self.method_key)
-        if j_obj["method"] == "MessageQueue":
+        #print "Publisher_Models::Try to send Message using Msg Queue %s using %s"%(msg_queues,self.method_key)
+        if j_obj["method"] == "PublisherMessageQueue":
             q = msg_queues["%s"%self.method_key]
             q.send(j_obj["msg"])
         
