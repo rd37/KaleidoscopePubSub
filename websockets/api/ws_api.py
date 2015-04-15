@@ -19,7 +19,12 @@ class PubSub_WS_API(object):
             self.ws = None
             self.state="Open"
         else:
-            print "Load cfg file and configure"
+            self.protocol="ws"
+            self.host=cfg['host']
+            self.port=cfg['ws_port']
+            self.state="Open"
+            self.ws=None
+            #print "Load cfg file and configure"
     
     def createSubscriber(self):
         if self.ws is None:
@@ -33,6 +38,7 @@ class PubSub_WS_API(object):
         
     def createPublisher(self):
         if self.ws is None:
+            print "Create Publisher %s://%s:%s"%(self.protocol,self.host,self.port)
             self.ws = create_connection("%s://%s:%s"%(self.protocol,self.host,self.port))
             self.ws.send('{"op":"createPublisher"}')
             result =  self.ws.recv()

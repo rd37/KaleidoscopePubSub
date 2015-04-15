@@ -20,11 +20,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = 'x(8-i3f$9n-qk(6v8-7i=5^a*lk8#y#us4932u=gxu7w_0l-^k'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-TEMPLATE_DEBUG = True
+TEMPLATE_DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost','127.0.0.1','142.104.17.141']
 
 ADMINS = (
     ('Ron Desmarais', 'rd@uvic.ca'),

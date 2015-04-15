@@ -14,7 +14,11 @@ class PubSub_HTTP_API(object):
             self.host="localhost"
             self.port=8000
         else:
-            print "Load defaults from cfg file %s"%cfg
+            self.protocol="http"
+            self.host=cfg['host']
+            self.port=cfg['http_port']
+            #self.state="Open"
+            #print "Load defaults from cfg file %s"%cfg
             
     def deletePublisher(self,pub_id):
         #print "Django_API::Delete Publisher %s"%pub_id
