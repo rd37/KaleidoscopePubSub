@@ -24,12 +24,15 @@ DEBUG = False
 
 TEMPLATE_DEBUG = False
 
-ALLOWED_HOSTS = ['localhost','127.0.0.1','142.104.17.141']
+ALLOWED_HOSTS = ['localhost','127.0.0.1','142.104.17.141','0.0.0.0']
 
 ADMINS = (
     ('Ron Desmarais', 'rd@uvic.ca'),
 )
 
+MANAGERS = (
+    ('Ron (MGR) Desmarais', 'rd@uvic.ca'),
+)
 # Application definition
 
 INSTALLED_APPS = (

@@ -5,7 +5,7 @@ Created on Apr 12, 2015
 '''
 
 from websocket import create_connection
-import json
+import json,thread
 
 class PubSub_WS_API(object):
     
@@ -38,7 +38,7 @@ class PubSub_WS_API(object):
         
     def createPublisher(self):
         if self.ws is None:
-            print "Create Publisher %s://%s:%s"%(self.protocol,self.host,self.port)
+            #print "Create Publisher %s://%s:%s"%(self.protocol,self.host,self.port)
             self.ws = create_connection("%s://%s:%s"%(self.protocol,self.host,self.port))
             self.ws.send('{"op":"createPublisher"}')
             result =  self.ws.recv()
@@ -62,12 +62,32 @@ class PubSub_WS_API(object):
             return result
     
     def pushSubscriberMessage(self,msg,pub_ws_id):
-        print "Create WS Connection and send %s to %s"%(msg,pub_ws_id)
-        print "%s://%s:%s"%(self.protocol,self.host,self.port)
+        #print "Create WS Connection and send %s to %s"%(msg,pub_ws_id)
+        #print "%s://%s:%s"%(self.protocol,self.host,self.port)
         self.ws = create_connection("%s://%s:%s"%(self.protocol,self.host,self.port))
-        print "WS_API sending now"
-        self.ws.send('{"op":"sendMessageWebSocket","message":"%s","pub_ws_id":%s}'%(msg,pub_ws_id))
+        #print "WS_API sending now"
+        self.ws.send('{"op":"sendMessageWebSocket","message":"%s","pub_ws_id":"%s"}'%(msg,pub_ws_id))
+        #print "WS_API done sending %s"%msg
         
-    def retreiveMessage(self):
+    def retreiveSyncMessage(self):
         return self.ws.recv()   
+    
+    def retreiveASyncMessage(self,cb):
+        thread.start_new_thread(self._rcv_callback, (cb,))
+        
+    def _rcv_callback(self,cb):
+        cb.async_callback(self.ws.recv())
+        #self._rcv_callback(cb)
+    
+    def registerASyncMessageCallback(self,cb):
+        thread.start_new_thread(self._rcv_callback_recursive, (cb,))
+        
+    def _rcv_callback_recursive(self,cb):
+        try:
+            cb.async_callback(self.ws.recv())
+            self._rcv_callback_recursive(cb)
+        except Exception as e:
+            print "Recursive Exception occured on thread, leaving %s"%e
+        
+        
         

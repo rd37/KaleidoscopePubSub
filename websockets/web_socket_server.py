@@ -27,11 +27,15 @@ class WebSocketHandler(Protocol):
     #    print "WS_SERVER::[CONNECTION] %s connected" % self.id
 
     def onDisconnect(self):
-        pub_sub_obj=self.pub_sub_ids[self.id]
-        if pub_sub_obj["Type"] == "Publisher":
-            result = self.pub_sub_api.deletePublisher(pub_sub_obj["PubID"])
-        elif pub_sub_obj["Type"] == "Subscriber":
-            result = self.pub_sub_api.deleteSubscriber(pub_sub_obj["SubID"])
+        try:
+            pub_sub_obj=self.pub_sub_ids[self.id]
+            if pub_sub_obj["Type"] == "Publisher":
+                result = self.pub_sub_api.deletePublisher(pub_sub_obj["PubID"])
+            elif pub_sub_obj["Type"] == "Subscriber":
+                result = self.pub_sub_api.deleteSubscriber(pub_sub_obj["SubID"])
+        except:
+            #print "%s is not a proper publisher must be from django app callback "%self.id
+            self.bad_id=self.id
 
     def onMessage(self, str_msg):
         try:
@@ -52,13 +56,16 @@ class WebSocketHandler(Protocol):
                 result = self.pub_sub_api.sendMessage(msg_json["message"],self.pub_sub_ids[self.id]["PubID"])
                 self.users[self.id].sendMessage(result.encode("ascii"))
             elif msg_json["op"] == "sendMessageWebSocket":
-                print "Great, now send %s to %s"%(msg_json["message"],msg_json["pub_ws_id"])
+                #print "Great"
+                #print "Great, now send %s to %s"%(msg_json["message"],msg_json["pub_ws_id"])
                 pub_ws_id=msg_json["pub_ws_id"]
                 message=msg_json["message"]
                 self.users[pub_ws_id].sendMessage(message.encode("ascii"))
                 #print "Send Message WebSocket"
             
         except Exception as e:
+            #print "Web Sock Server Error %s"%e
+            #print "On message %s"%str_msg
             self.users[self.id].sendMessage(('{"result":"failure","id":-1}').encode("ascii"))
             
       

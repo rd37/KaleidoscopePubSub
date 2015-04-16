@@ -6,12 +6,7 @@ Created on Feb 11, 2015
 
 from websockets.api.ws_api import PubSub_WS_API
 #Subscriber queue for polling
-from threading import Thread
-
-class ThreadWSCall(Thread):
-    
-    def __init(self):
-        super("ThreadWSCall")
+import thread
 
 class WSSubscriberMessageQueue(object):
     
@@ -20,9 +15,12 @@ class WSSubscriberMessageQueue(object):
         #self.queue = []
     
     def send(self,msg):
-        print "Try to send WS message %s to %s "%(msg,self.sub_ws_id)
+        thread.start_new_thread(self.invoke, (msg,))
+        
+    def invoke(self,msg):
+        #print "WS Try to send WS message %s to %s "%(msg,self.sub_ws_id)
         ws_api = PubSub_WS_API(None)
-        ws_api.pushSubscriberMessage(msg,self.sub_ws_id)
+        ws_api.pushSubscriberMessage(msg.encode("ascii"),self.sub_ws_id)
         ws_api.closeConnection()
 
 #Subscriber queue for polling
